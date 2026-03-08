@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC Address Converter</title>
+    <style>
+        /* Base Light Theme Variables */
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333333;
+            --container-bg: #ffffff;
+            --container-shadow: rgba(0, 0, 0, 0.1);
+            --heading-color: #222222;
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+            --input-text: #333333;
+            --input-placeholder: #888888;
+            --th-bg: #f8f9fa;
+            --td-border: #eeeeee;
+            --svg-fill: #555555;
+            --svg-hover-fill: #111111;
+            --btn-hover-bg: #e2e6ea;
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+
+        /* Auto-Switch to Dark Theme */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+                --container-bg: #1e1e1e;
+                --container-shadow: rgba(0, 0, 0, 0.5);
+                --heading-color: #ffffff;
+                --input-bg: #2d2d2d;
+                --input-border: #444444;
+                --input-text: #ffffff;
+                --input-placeholder: #888888;
+                --th-bg: #2a2a2a;
+                --td-border: #333333;
+                --svg-fill: #aaaaaa;
+                --svg-hover-fill: #ffffff;
+                --btn-hover-bg: #333333;
+                --success-color: #2ebd4e;
+                --error-color: #ff6b6b;
+            }
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--container-shadow);
+            width: 100%;
+            max-width: 550px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--heading-color);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 40px 12px 12px; 
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            font-family: monospace;
+            text-transform: uppercase; 
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]::placeholder {
+            color: var(--input-placeholder);
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        
+        /* The new success flash class */
+        input[type="text"].success-flash {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.4);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .clear-btn:hover {
+            background-color: var(--btn-hover-bg);
+        }
+        .clear-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--svg-fill);
+            transition: fill 0.2s;
+        }
+        .clear-btn:hover svg {
+            fill: var(--svg-hover-fill);
+        }
+        .error {
+            color: var(--error-color);
+            font-size: 14px;
+            display: none;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            display: none;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--td-border);
+        }
+        th {
+            background-color: var(--th-bg);
+            width: 35%;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: background-color 0.3s;
+        }
+        td {
+            font-family: monospace;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .copy-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: var(--btn-hover-bg);
+        }
+        .copy-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--svg-fill);
+            transition: fill 0.2s;
+        }
+        .copy-btn:hover svg {
+            fill: var(--svg-hover-fill);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>MAC Address Converter</h2>
+    
+    <div class="input-group">
+        <div class="input-wrapper">
+            <input type="text" id="macInput" placeholder="Paste MAC (e.g., 00:1B:63:84:45:E6)" autofocus>
+            <button class="clear-btn" onclick="clearInput()" title="Clear input">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a1.49 1.49 0 0 0-2.12 0L9 11.54l3.46 3.46 8.25-8.25c.59-.59.59-1.54 0-2.12z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div id="errorMsg" class="error">Too many characters. A MAC address contains exactly 12 hexadecimal digits.</div>
+
+    <table id="resultTable">
+        <tbody id="resultBody">
+            </tbody>
+    </table>
+</div>
+
+<div id="toast" class="toast">Copied!</div>
+
+<script>
+    const inputField = document.getElementById('macInput');
+    const errorMsg = document.getElementById('errorMsg');
+    const resultTable = document.getElementById('resultTable');
+    const resultBody = document.getElementById('resultBody');
+
+    inputField.addEventListener('input', function() {
+        const input = inputField.value.trim();
+
+        if (input === '') {
+            resetUI();
+            return;
+        }
+
+        const noPrefix = input.replace(/^0x/i, '');
+        const cleanMac = noPrefix.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        
+        if (cleanMac.length === 12) {
+            errorMsg.style.display = 'none';
+            generateTable(cleanMac);
+            triggerSuccessFlash();
+        } else if (cleanMac.length > 12) {
+            errorMsg.style.display = 'block';
+            resultTable.style.display = 'none';
+        } else {
+            errorMsg.style.display = 'none';
+            resultTable.style.display = 'none';
+        }
+    });
+
+    function triggerSuccessFlash() {
+        // Remove the class first just in case they paste really fast twice in a row
+        inputField.classList.remove('success-flash');
+        
+        // A tiny timeout to force the browser to reflow, ensuring the animation restarts
+        setTimeout(() => {
+            inputField.classList.add('success-flash');
+            
+            // Remove the flash class after half a second
+            setTimeout(() => {
+                inputField.classList.remove('success-flash');
+            }, 500);
+        }, 10);
+    }
+
+    function generateTable(cleanMac) {
+        const formats = [
+            { label: 'Alphanumeric', value: cleanMac },
+            { label: 'Dot Notation', value: cleanMac.match(/.{1,4}/g).join('.') },
+            { label: 'Hexadecimal', value: cleanMac.match(/.{1,2}/g).join(':') },
+            { label: 'Hyphenated (IEEE 802)', value: cleanMac.match(/.{1,2}/g).join('-') },
+            { label: 'Cisco Dash', value: cleanMac.match(/.{1,4}/g).join('-') },
+            { label: 'Byte String', value: `{${cleanMac.match(/.{1,2}/g).join(',')}}` },
+            { label: 'Base-16 Integer', value: `0x${cleanMac}` }
+        ];
+        
+        resultBody.innerHTML = '';
+        
+        formats.forEach(f => {
+            const row = document.createElement('tr');
+            
+            const th = document.createElement('th');
+            th.textContent = f.label;
+            
+            const td = document.createElement('td');
+            
+            const span = document.createElement('span');
+            span.textContent = f.value;
+            
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.title = 'Copy to clipboard';
+            btn.onclick = () => copyToClipboard(f.value);
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+            `;
+            
+            td.appendChild(span);
+            td.appendChild(btn);
+            
+            row.appendChild(th);
+            row.appendChild(td);
+            resultBody.appendChild(row);
+        });
+        
+        resultTable.style.display = 'table';
+    }
+
+    function clearInput() {
+        inputField.value = '';
+        resetUI();
+        inputField.focus();
+    }
+
+    function resetUI() {
+        errorMsg.style.display = 'none';
+        resultTable.style.display = 'none';
+        resultBody.innerHTML = '';
+        inputField.classList.remove('success-flash');
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
+            
+            inputField.focus();
+            inputField.select();
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert("Clipboard access denied. Please copy manually.");
+            
+            inputField.focus();
+            inputField.select();
+        });
+    }
+</script>
+
+</body>
+</html>
